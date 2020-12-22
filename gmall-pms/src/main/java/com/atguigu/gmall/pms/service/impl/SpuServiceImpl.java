@@ -10,6 +10,7 @@ import com.atguigu.gmall.pms.service.SkuAttrValueService;
 import com.atguigu.gmall.pms.service.SpuAttrValueService;
 import com.atguigu.gmall.pms.service.SpuDescService;
 import com.atguigu.gmall.sms.entity.dto.SkuSaleDto;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import com.atguigu.gmall.common.bean.PageResultVo;
 import com.atguigu.gmall.common.bean.PageParamVo;
 
 import com.atguigu.gmall.pms.service.SpuService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -75,6 +77,7 @@ public class SpuServiceImpl extends ServiceImpl<SpuMapper, SpuEntity> implements
         return new PageResultVo(page);
     }
 
+    @GlobalTransactional
     @Override
     public void saveAllInformation(SpuVo spuVo) {
         //1.新增spu 信息 pms_spu
@@ -171,7 +174,10 @@ public class SpuServiceImpl extends ServiceImpl<SpuMapper, SpuEntity> implements
             skuSaleDto.setSkuId(skuId);
 
             smsFeignClient.saveSkuSaleInfo(skuSaleDto);
+
+
         });
+//        int i = 1/0;
     }
 
 }

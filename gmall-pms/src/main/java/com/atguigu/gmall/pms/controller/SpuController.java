@@ -1,5 +1,4 @@
 package com.atguigu.gmall.pms.controller;
-
 import java.util.List;
 
 import com.atguigu.gmall.pms.entity.vo.SpuVo;
@@ -37,6 +36,17 @@ public class SpuController {
 
 
     /**
+     * 列表
+     */
+    @PostMapping("page")
+    @ApiOperation("分页查询spu")
+    public ResponseVo<List<SpuEntity>> querySpusByPage(@RequestBody PageParamVo paramVo){
+        PageResultVo pageResultVo = spuService.queryPage(paramVo);
+
+        return ResponseVo.ok((List<SpuEntity>)pageResultVo.getList());
+    }
+
+    /**
      * http://api.gmall.com/pms/spu/category/0?t=1608097853877&pageNum=1&pageSize=10&key=
      */
     @GetMapping("category/{categoryId}")
@@ -48,9 +58,11 @@ public class SpuController {
         return ResponseVo.ok(pageResultVo);
     }
 
-    /**
+/*
+    *
      * 列表
-     */
+*/
+
     @GetMapping
     @ApiOperation("分页查询")
     public ResponseVo<PageResultVo> querySpuByPage(PageParamVo paramVo){

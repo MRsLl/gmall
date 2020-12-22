@@ -9,6 +9,9 @@ spring:
       transport:
         dashboard: localhost:8080
         port: 8719
+    alibaba:
+      seata:
+        tx-service-group: sms-service-group
   redis:
     host: 192.168.136.140
     port: 6379

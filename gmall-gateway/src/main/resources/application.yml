@@ -27,3 +27,7 @@ spring:
           uri: lb://sms-service
           predicates:
             - Path=/sms/**
+        - id: search-route #商品搜索路由
+          uri: lb://search-service
+          predicates:
+            - Host=search.gmall.com

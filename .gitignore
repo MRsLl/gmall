@@ -2,6 +2,10 @@
 *.class
 gmall.iml
 .idea/
+target/
+mvnw
+mvnw.cmd
+HELP.md
 # Log file
 *.log
 
