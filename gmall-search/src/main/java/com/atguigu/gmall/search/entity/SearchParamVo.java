@@ -25,7 +25,7 @@ public class SearchParamVo {
     //价格区间终止值
     private Double priceTo;
     //页码
-    private Integer pageNum;
+    private Integer pageNum = 1;
     //每页最大商品条数
     private final Integer pageSize = 20;
     //库存

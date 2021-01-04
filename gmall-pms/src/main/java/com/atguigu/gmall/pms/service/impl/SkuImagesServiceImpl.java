@@ -1,6 +1,8 @@
 package com.atguigu.gmall.pms.service.impl;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +26,14 @@ public class SkuImagesServiceImpl extends ServiceImpl<SkuImagesMapper, SkuImages
         );
 
         return new PageResultVo(page);
+    }
+
+    @Override
+    public List<SkuImagesEntity> querySkuImagesBySkuId(Long skuId) {
+        QueryWrapper<SkuImagesEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("sku_id",skuId);
+
+        return baseMapper.selectList(queryWrapper);
     }
 
 }

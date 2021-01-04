@@ -8,7 +8,7 @@ import com.atguigu.gmall.common.bean.PageResultVo;
 import com.atguigu.gmall.common.bean.PageParamVo;
 
 import com.atguigu.gmall.wms.mapper.WareOrderBillDetailMapper;
-import com.atguigu.gmall.pms.entity.WareOrderBillDetailEntity;
+import com.atguigu.gmall.wms.entity.WareOrderBillDetailEntity;
 import com.atguigu.gmall.wms.service.WareOrderBillDetailService;
 
 

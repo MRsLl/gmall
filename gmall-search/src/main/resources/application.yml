@@ -20,6 +20,19 @@ spring:
   elasticsearch:
     rest:
       uris: http://127.0.0.1:9200
+  thymeleaf:
+    cache: false
+  rabbitmq:
+    host: 192.168.136.140
+    username: ll
+    password: 12345
+    listener:
+      type: simple
+      simple:
+        prefetch: 1
+        concurrency: 4
+        acknowledge-mode: manual
+    virtual-host: /ll
 feign:
   sentinel:
     enabled: true

@@ -1,22 +1,20 @@
 package com.atguigu.gmall.search;
 
 import com.atguigu.gmall.common.bean.PageParamVo;
-import com.atguigu.gmall.common.bean.ResponseVo;
 import com.atguigu.gmall.pms.entity.*;
 import com.atguigu.gmall.search.entity.Goods;
 import com.atguigu.gmall.search.entity.SearchAttrValue;
 import com.atguigu.gmall.search.feign.GmallPmsClient;
 import com.atguigu.gmall.search.feign.GmallWmsClient;
 import com.atguigu.gmall.search.repository.GoodsRepository;
+import com.atguigu.gmall.wms.entity.WareSkuEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,7 +82,7 @@ class GmallSearchApplicationTests {
                         goods.setCategoryName(categoryEntity.getName());
 
                         //为goods 设置库存信息
-                        List<WareSkuEntity> wareSkuEntities = gmallWmsClient.queryWareSkyBySkuId(skuId).getData();
+                        List<WareSkuEntity> wareSkuEntities = gmallWmsClient.queryWareBySkuId(skuId).getData();
                         if (!CollectionUtils.isEmpty(wareSkuEntities)) {
                             boolean flag = wareSkuEntities.stream().anyMatch(wareSkuEntity -> wareSkuEntity.getStock() - wareSkuEntity.getStockLocked() > 0);
 

@@ -12,6 +12,7 @@ import com.atguigu.gmall.pms.service.SpuDescService;
 import com.atguigu.gmall.sms.entity.dto.SkuSaleDto;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,6 @@ import com.atguigu.gmall.common.bean.PageResultVo;
 import com.atguigu.gmall.common.bean.PageParamVo;
 
 import com.atguigu.gmall.pms.service.SpuService;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -47,6 +47,8 @@ public class SpuServiceImpl extends ServiceImpl<SpuMapper, SpuEntity> implements
     private SkuAttrValueService skuAttrValueService;
     @Autowired
     private SmsFeignClient smsFeignClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public PageResultVo queryPage(PageParamVo paramVo) {
@@ -75,6 +77,15 @@ public class SpuServiceImpl extends ServiceImpl<SpuMapper, SpuEntity> implements
         IPage<SpuEntity> page = this.page(pageParamVo.getPage(), queryWrapper);
 
         return new PageResultVo(page);
+    }
+
+    private void sendMessage(Long id,String type) {
+        // 发送消息
+        try {
+            this.rabbitTemplate.convertAndSend("item_exchange", "item." + type, id);
+        } catch (Exception e) {
+            System.out.println("{}商品消息发送异常，商品id：{}" + type + id + e);
+        }
     }
 
     @GlobalTransactional
@@ -175,8 +186,9 @@ public class SpuServiceImpl extends ServiceImpl<SpuMapper, SpuEntity> implements
 
             smsFeignClient.saveSkuSaleInfo(skuSaleDto);
 
-
         });
+
+        sendMessage(spuId,"insert");
 //        int i = 1/0;
     }
 

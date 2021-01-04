@@ -28,6 +28,13 @@ spring:
   sleuth:
     sampler:
       rate: 1
+  rabbitmq:
+    virtual-host: /ll
+    host: 192.168.136.140
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    username: ll
+    password: 12345
 feign:
   sentinel:
     enabled: true

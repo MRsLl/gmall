@@ -5,4 +5,6 @@ import com.atguigu.gmall.search.entity.SearchResponseVo;
 
 public interface SearchService {
     SearchResponseVo search(SearchParamVo searchParamVo);
+
+    void createIndex(Long id);
 }

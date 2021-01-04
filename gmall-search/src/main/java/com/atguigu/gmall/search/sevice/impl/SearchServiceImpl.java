@@ -1,20 +1,19 @@
 package com.atguigu.gmall.search.sevice.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.atguigu.gmall.pms.entity.BrandEntity;
-import com.atguigu.gmall.pms.entity.CategoryEntity;
-import com.atguigu.gmall.search.entity.Goods;
-import com.atguigu.gmall.search.entity.SearchParamVo;
-import com.atguigu.gmall.search.entity.SearchResponseAttrVo;
-import com.atguigu.gmall.search.entity.SearchResponseVo;
+import com.atguigu.gmall.pms.entity.*;
+import com.atguigu.gmall.search.entity.*;
+import com.atguigu.gmall.search.feign.GmallPmsClient;
+import com.atguigu.gmall.search.feign.GmallWmsClient;
+import com.atguigu.gmall.search.repository.GoodsRepository;
 import com.atguigu.gmall.search.sevice.SearchService;
+import com.atguigu.gmall.wms.entity.WareSkuEntity;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -24,23 +23,24 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregator;
 import org.elasticsearch.search.aggregations.bucket.nested.ParsedNested;
 import org.elasticsearch.search.aggregations.bucket.terms.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class SearchServiceImpl implements SearchService {
@@ -59,8 +59,8 @@ public class SearchServiceImpl implements SearchService {
             responseVo = parseResult(response);
 
             //为返回值设置页码和每页最大值
-            if (searchParamVo.getPageNum() == null || searchParamVo.getPageNum() <= 0) {
-                responseVo.setPageNum(0);
+            if (searchParamVo.getPageNum() <= 0) {
+                responseVo.setPageNum(1);
             } else {
               responseVo.setPageNum(searchParamVo.getPageNum());
             }
@@ -267,11 +267,11 @@ public class SearchServiceImpl implements SearchService {
         Integer pageNum = paramVo.getPageNum();
         Integer pageSize = paramVo.getPageSize();
 
-        if (pageNum != null && pageNum > 0) {
+        if (pageNum > 0) {
             sourceBuilder.from((pageNum - 1) * pageSize);
             sourceBuilder.size(pageSize);
         } else {
-            sourceBuilder.from(0);
+            sourceBuilder.from(1);
             sourceBuilder.size(pageSize);
         }
 
@@ -330,4 +330,88 @@ public class SearchServiceImpl implements SearchService {
 //        System.out.println(sourceBuilder);
         return sourceBuilder;
     }
+
+    @Autowired
+    private GmallPmsClient gmallPmsClient;
+    @Autowired
+    private GmallWmsClient gmallWmsClient;
+    @Autowired
+    private GoodsRepository goodsRepository;
+
+    @Override
+    public void createIndex(Long spuId) {
+        SpuEntity spuEntity = gmallPmsClient.querySpuById(spuId).getData();
+        List<SkuEntity> skus = gmallPmsClient.querySkuBySpuId(spuId).getData();
+
+        if (!CollectionUtils.isEmpty(skus)) {
+            //3.遍历sku 集合，将sku 集合转为 goods 集合
+            List<Goods> goodsList = skus.stream().map(skuEntity -> {
+                Long skuId = skuEntity.getId();
+                Goods goods = new Goods();
+
+                //为goods 设置sku 相关信息
+                goods.setSkuId(skuId);
+                goods.setPrice(skuEntity.getPrice().doubleValue());
+                goods.setCreateTime(spuEntity.getCreateTime());
+                goods.setTitle(skuEntity.getTitle());
+                goods.setSubTitle(skuEntity.getSubtitle());
+                goods.setDefaultImage(skuEntity.getDefaultImage());
+
+                //为goods 设置品牌相关信息
+                BrandEntity brandEntity = gmallPmsClient.queryBrandById(skuEntity.getBrandId()).getData();
+                goods.setBrandId(brandEntity.getId());
+                goods.setBrandName(brandEntity.getName());
+                goods.setLogo(brandEntity.getLogo());
+                goods.setSales(0l);
+
+                //为goods 设置分类相关信息
+                CategoryEntity categoryEntity = gmallPmsClient.queryCategoryById(skuEntity.getCatagoryId()).getData();
+                goods.setCategoryId(categoryEntity.getId());
+                goods.setCategoryName(categoryEntity.getName());
+
+                //为goods 设置库存信息
+                List<WareSkuEntity> wareSkuEntities = gmallWmsClient.queryWareBySkuId(skuId).getData();
+                if (!CollectionUtils.isEmpty(wareSkuEntities)) {
+                    boolean flag = wareSkuEntities.stream().anyMatch(wareSkuEntity -> wareSkuEntity.getStock() - wareSkuEntity.getStockLocked() > 0);
+
+                    goods.setStore(flag);
+                }
+
+                //为goods 设置spu 搜索参数信息
+                ArrayList<SearchAttrValue> searchAttrValues = new ArrayList<>();
+                List<SpuAttrValueEntity> spuAttrValueEntities = gmallPmsClient.querySearchAttrValueBySpuId(spuId).getData();
+
+                if (!CollectionUtils.isEmpty(spuAttrValueEntities)) {
+                    searchAttrValues = (ArrayList<SearchAttrValue>) spuAttrValueEntities.stream().map(spuAttrValueEntity -> {
+                        SearchAttrValue searchAttrValue = new SearchAttrValue();
+                        BeanUtils.copyProperties(spuAttrValueEntity, searchAttrValue);
+
+                        return searchAttrValue;
+                    }).collect(Collectors.toList());
+                }
+
+                //为goods 设置sku 搜索参数信息
+                List<SkuAttrValueEntity> skuAttrValueEntities = gmallPmsClient.querySearchAttrValueBySkuId(skuId).getData();
+
+                if (!CollectionUtils.isEmpty(skuAttrValueEntities)) {
+
+                    List<SearchAttrValue> searchSkuAttrValues = skuAttrValueEntities.stream().map(skuAttrValueEntity -> {
+                        SearchAttrValue searchAttrValue = new SearchAttrValue();
+                        BeanUtils.copyProperties(skuAttrValueEntity, searchAttrValue);
+
+                        return searchAttrValue;
+                    }).collect(Collectors.toList());
+
+                    searchAttrValues.addAll(searchSkuAttrValues);
+                }
+
+                goods.setSearchAttrs(searchAttrValues);
+
+                return goods;
+            }).collect(Collectors.toList());
+
+            goodsRepository.saveAll(goodsList);
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ package com.atguigu.gmall.pms.controller;
 import java.util.List;
 
 import com.atguigu.gmall.pms.entity.vo.GroupVo;
+import com.atguigu.gmall.pms.entity.vo.ItemGroupVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,8 +38,20 @@ public class AttrGroupController {
     private AttrGroupService attrGroupService;
 
 
+    @GetMapping("withattrs/category/{cid}")
+    @ApiOperation("根据分类id 查询规格参数分组及其组下所有规格参数(包含值)")
+    public ResponseVo<List<ItemGroupVo>> queryItemGroupVosByCategoryIdAndSpuIdAndSkuId(
+            @PathVariable(value = "cid") Long cid,
+            @RequestParam Long spuId,
+            @RequestParam Long skuId
+    ) {
+        List<ItemGroupVo> itemGroupVos = attrGroupService.queryItemGroupVosByCategoryIdAndSpuIdAndSkuId(cid,spuId,skuId);
+
+        return ResponseVo.ok(itemGroupVos);
+    }
+
     @GetMapping("withattrs/{catId}")
-    @ApiOperation("")
+    @ApiOperation("根据分类id 查询所有规格参数")
     public ResponseVo<List<GroupVo>> queryAttrsByCategoryId(@PathVariable("catId") Long categoryId){
         List<GroupVo> groupVos = attrGroupService.queryAttrsByCategoryId(categoryId);
 

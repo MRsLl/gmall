@@ -34,3 +34,10 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto  # 默认使用数据库自增
+aliyun:
+  sms: #阿里云短信服务自定义配置类
+    signName: 谷粒在线教育
+    templateCode: SMS_205825986
+    codePrefix: ums:code
+    keyId: LTAI4G7h4Ujt8zoQL2ixMavW
+    keySecret: VskFsL0TCFaaGzrGsDPTVhOyFqbLdt

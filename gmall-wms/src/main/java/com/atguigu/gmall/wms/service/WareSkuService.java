@@ -3,7 +3,7 @@ package com.atguigu.gmall.wms.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.gmall.common.bean.PageResultVo;
 import com.atguigu.gmall.common.bean.PageParamVo;
-import com.atguigu.gmall.pms.entity.WareSkuEntity;
+import com.atguigu.gmall.wms.entity.WareSkuEntity;
 
 /**
  * 商品库存

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.atguigu.gmall.pms.entity.WareSkuEntity;
+import com.atguigu.gmall.wms.entity.WareSkuEntity;
 import com.atguigu.gmall.wms.service.WareSkuService;
 import com.atguigu.gmall.common.bean.PageResultVo;
 import com.atguigu.gmall.common.bean.ResponseVo;
@@ -37,7 +37,7 @@ public class WareSkuController {
 
     @GetMapping("sku/{skuId}")
     @ApiOperation("根据skuId 查询商品库存")
-    public ResponseVo<List<WareSkuEntity>> queryWareSkyBySkuId(@PathVariable("skuId") Long skuId) {
+    public ResponseVo<List<WareSkuEntity>> queryWareBySkuId(@PathVariable("skuId") Long skuId) {
         List<WareSkuEntity> skuEntities = wareSkuService.list(new QueryWrapper<WareSkuEntity>().eq("sku_id", skuId));
 
         return ResponseVo.ok(skuEntities);

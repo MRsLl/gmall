@@ -1,7 +1,9 @@
 spring:
   application:
-    name: guli-gateway
+    name: gmall-gateway
   cloud:
     nacos:
       config:
         server-addr: localhost:8848
+#      discovery:
+#        server-addr: localhost:8848

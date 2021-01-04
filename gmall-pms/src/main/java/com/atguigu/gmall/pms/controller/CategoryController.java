@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +35,19 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    @GetMapping("all/{cid}")
+    @ApiOperation("根据三级分类id 查询三级二级一级分类对象")
+    public ResponseVo<List<CategoryEntity>> getCategoriesByLv3Id(@PathVariable(value = "cid") Long cid){
+        List<CategoryEntity> categoryEntities = categoryService.getCategoriesByLv3Id(cid);
+        return ResponseVo.ok(categoryEntities);
+    }
 
+    @GetMapping("subs/{pid}")
+    @ApiOperation("根据一级分类id 查询所有二级三级分类")
+    public ResponseVo<List<CategoryEntity>> getCategoriesByLv1Id(@PathVariable(value = "pid") Long parentId){
+        List<CategoryEntity> categoryEntities = categoryService.getCategoriesByLv1Id(parentId);
+        return ResponseVo.ok(categoryEntities);
+    }
 
     @GetMapping("parent/{parentId}")
     @ApiOperation("根据父分类id 查询子分类")

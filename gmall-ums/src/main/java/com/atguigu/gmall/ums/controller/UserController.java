@@ -2,6 +2,7 @@ package com.atguigu.gmall.ums.controller;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,38 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @GetMapping("query")
+    @ApiOperation("根据登录名和密码查询用户")
+    public ResponseVo<UserEntity> queryUser(@RequestParam("loginName") String loginName,@RequestParam("password") String password) {
+        UserEntity userEntity = userService.queryUser(loginName,password);
+
+        return ResponseVo.ok(userEntity);
+    }
+
+    @PostMapping("register")
+    @ApiOperation("用户注册")
+    public ResponseVo register( UserEntity userEntity,@RequestParam("code") String code) {
+        userService.register(userEntity,code);
+
+        return ResponseVo.ok();
+    }
+
+    @PostMapping("code")
+    @ApiOperation("生成并发送短信验证码")
+    public ResponseVo sendCode(@RequestParam String phone) {
+
+        userService.sendCode(phone);
+        return ResponseVo.ok();
+    }
+
+    @GetMapping("check/{data}/{type}")
+    @ApiOperation("用户数据校验")
+    public ResponseVo<Boolean> checkData(@PathVariable(value = "data") String data,
+                                         @PathVariable(value = "type") Integer type) {
+        Boolean flag = userService.checkData(data,type);
+        return ResponseVo.ok(flag);
+    }
 
     /**
      * 列表
