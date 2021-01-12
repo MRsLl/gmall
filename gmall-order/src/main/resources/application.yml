@@ -1,0 +1,46 @@
+server:
+  port: 18091
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+        port: 8719
+  zipkin:
+    base-url: http://localhost:9411
+    discovery-client-enabled: false
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
+  redis:
+    host: 192.168.136.140
+  rabbitmq:
+    host: 192.168.136.140
+    virtual-host: /ll
+    username: ll
+    password: 12345
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1
+    publisher-returns: true
+    publisher-confirm-type: correlated
+  thymeleaf:
+    cache: false
+feign:
+  sentinel:
+    enabled: true
+logging:
+  level:
+    com.atguigu.gmall: debug
+thread:
+  pool:
+    coreSize: 100
+    maxSize: 500
+    keepalive: 60
+    blockQueueSize: 1000

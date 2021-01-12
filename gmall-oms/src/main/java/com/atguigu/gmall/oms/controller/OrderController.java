@@ -2,6 +2,8 @@ package com.atguigu.gmall.oms.controller;
 
 import java.util.List;
 
+import com.atguigu.gmall.oms.vo.OrderConfirmVo;
+import com.atguigu.gmall.oms.vo.OrderSumbitVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.atguigu.gmall.oms.entity.OrderEntity;
@@ -34,6 +35,14 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+
+    @PostMapping("{userId}")
+    @ApiOperation("保存订单和订单详情")
+    public ResponseVo<OrderEntity> saveOrder(@RequestBody OrderSumbitVo orderSumbitVo, @PathVariable(value = "userId") Long userId) {
+        OrderEntity orderEntity = orderService.saveOrder(orderSumbitVo, userId);
+
+        return ResponseVo.ok(orderEntity);
+    }
     /**
      * 列表
      */

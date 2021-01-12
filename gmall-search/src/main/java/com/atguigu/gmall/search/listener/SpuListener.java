@@ -49,7 +49,7 @@ public class SpuListener {
                 channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
             } else {
                 // 未重试过，重新入队
-                channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
+                channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
             }
         }
     }

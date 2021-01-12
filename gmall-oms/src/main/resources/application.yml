@@ -9,6 +9,17 @@ spring:
       transport:
         dashboard: localhost:8080
         port: 8719
+  rabbitmq:
+    host: 192.168.136.140
+    virtual-host: /ll
+    username: ll
+    password: 12345
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1
+    publisher-returns: true
+    publisher-confirm-type: correlated
   redis:
     host: 192.168.136.140
     port: 6379
@@ -34,3 +45,9 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto  # 默认使用数据库自增
+thread:
+  pool:
+    coreSize: 100
+    maxSize: 500
+    keepalive: 60
+    blockQueueSize: 1000

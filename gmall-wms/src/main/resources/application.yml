@@ -2,13 +2,21 @@ server:
   port: 18085
 spring:
   cloud:
-    nacos:
-      discovery:
-        server-addr: localhost:8848
     sentinel:
       transport:
         dashboard: localhost:8080
         port: 8719
+  rabbitmq:
+    host: 192.168.136.140
+    virtual-host: /ll
+    username: ll
+    password: 12345
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1
+    publisher-confirm-type: correlated
+    publisher-returns: true
   redis:
     host: 192.168.136.140
     port: 6379
